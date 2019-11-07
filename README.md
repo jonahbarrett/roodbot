@@ -41,7 +41,7 @@ Navigate to the CONFIG folder:
       ```
       python import_text_file.py "your-data-file-name-here"
       ```
-      It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
+    - It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
   - Another option is to let the bot run for a while and learn from the user messages being sent in the servers.
 - Be sure to check the discord connector as you can set channels for it to ignore, especially bot commands and what not.
 - Every time the bot starts it will train on all new data it acquired since it started up last
@@ -55,7 +55,7 @@ Navigate to the CONFIG folder:
   - You will need to register a bot with Discord: https://discordapp.com/developers/applications/me#top
   - Click New Application and set a name for it, click the Bot tab and click add bot
   - Now copy the **Client ID**, **Username#xxxx**, and **TOKEN** to the discord.py file.
-Go back to the Root Directory
+- Go back to the Root Directory
 - python armchair.py
 - When the bot starts you should see a message print to the console containing a link which will allow you to join the bot to a server.
 
@@ -65,5 +65,5 @@ Go back to the Root Directory
 - Create an access token for your account
 - Copy config/twitter.example.py to config/twitter.py
 - Fill in the tokens and secrets along with your handle
-Go back to the Root Directory
+- Go back to the Root Directory
 - python armchair.py
