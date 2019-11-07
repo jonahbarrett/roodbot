@@ -3,6 +3,7 @@ import re
 
 import discord
 import logging
+from discord.ext import commands
 from config.discord import *
 from connectors.connector_common import *
 from storage.discord import DiscordTrainingDataManager
@@ -31,7 +32,7 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
 
 class DiscordClient(discord.Client):
     def __init__(self, worker: 'DiscordWorker'):
-        discord.Client.__init__(self)
+        discord.Client.__init__(self, activity=discord.Game(name="I imagine a future where I can be with you", type=3), status=discord.Status.idle)
         self._worker = worker
         self._ready = False
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -44,18 +45,18 @@ class DiscordClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         # Prevent feedback loop
-        if str(message.author) == DISCORD_USERNAME:
+        if message.author.bot:
             return
 
         filtered_content = DiscordHelper.filter_content(message)
 
         learn = False
         # Learn from private messages
-        if message.server is None and DISCORD_LEARN_FROM_DIRECT_MESSAGE:
+        if message.guild is None and DISCORD_LEARN_FROM_DIRECT_MESSAGE:
             DiscordTrainingDataManager().store(message)
             learn = True
         # Learn from all server messages
-        elif message.server is not None and DISCORD_LEARN_FROM_ALL:
+        elif message.guild is not None and DISCORD_LEARN_FROM_ALL:
             if str(message.channel) not in DISCORD_LEARN_CHANNEL_EXCEPTIONS:
                 DiscordTrainingDataManager().store(message)
                 learn = True
@@ -69,6 +70,21 @@ class DiscordClient(discord.Client):
             self._worker.send(ConnectorRecvMessage(filtered_content, learn=True, reply=False))
             self._worker.recv()
 
+        # try replying after keyword
+        # if not message.author.bot:
+        '''if message.content.startswith('khep ') or message.content.startswith('khep '):
+            ModMessage = message.content[5:]
+            self._logger.debug("Message: %s" % filtered_content)
+            self._worker.send(ConnectorRecvMessage(filtered_content))
+            reply = self._worker.recv()
+            self._logger.debug("Reply: %s" % reply)
+            if reply is not None:
+                embed = discord.Embed(description=reply, color=message.author.color)
+                embed.set_footer(text = "Question asked by "+ message.author.name, icon_url = message.author.avatar_url)
+                await message.channel.send(reply)
+            return'''
+
+
         # Reply to mentions
         for mention in message.mentions:
             if str(mention) == DISCORD_USERNAME:
@@ -77,17 +93,21 @@ class DiscordClient(discord.Client):
                 reply = self._worker.recv()
                 self._logger.debug("Reply: %s" % reply)
                 if reply is not None:
-                    await self.send_message(message.channel, reply)
+                    embed = discord.Embed(description=reply, color=message.author.color)
+                    embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                    await message.channel.send(embed=embed)
                 return
 
         # Reply to private messages
-        if message.server is None:
+        if message.guild is None:
             self._logger.debug("Private Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
             reply = self._worker.recv()
             self._logger.debug("Reply: %s" % reply)
             if reply is not None:
-                await self.send_message(message.channel, reply)
+                embed = discord.Embed(description=reply, color=message.author.color)
+                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                await message.channel.send(embed=embed)
             return
 
 
