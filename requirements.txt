@@ -1,0 +1,8 @@
+Keras
+spacy
+spacymoji
+spacy
+numpy
+tweepy
+discord.py
+SQLAlchemy
