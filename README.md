@@ -39,7 +39,7 @@ Navigate to the CONFIG folder:
   - You can use the provided script in "\scripts\import_text_file.py"
     - Simply copy the script to the root folder, together with your txt file and run it as:
       ```
-      python import_text_file.py "your-data-file-name-here"
+      python import_txt.py "<your-data-file-name-here>"
       ```
     - It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
   - Another option is to let the bot run for a while and learn from the user messages being sent in the servers.
