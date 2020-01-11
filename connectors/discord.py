@@ -10,6 +10,8 @@ from storage.discord import DiscordTrainingDataManager
 from common.discord import DiscordHelper
 from spacy.tokens import Doc
 
+from datetime import datetime
+t1 = datetime.now()
 
 class DiscordReplyGenerator(ConnectorReplyGenerator):
     def generate(self, message: str, doc: Doc = None) -> Optional[str]:
@@ -23,7 +25,9 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
             # Remove URLs
             reply = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', reply)
             reply = reply.strip()
-
+        if EMOTES_SKIP:
+            reply = re.sub(r'<:[^\s]+:[0-9]*>', '', reply)
+            reply = reply.strip()
         if len(reply) > 0:
             return reply
         else:
@@ -31,14 +35,15 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
 
 
 class DiscordClient(discord.Client):
+
     def __init__(self, worker: 'DiscordWorker'):
         discord.Client.__init__(self, activity=discord.Game(name="I imagine a future where I can be with you", type=3), status=discord.Status.idle)
         self._worker = worker
-        self._ready = False
+        self._ready.set()
         self._logger = logging.getLogger(self.__class__.__name__)
 
     async def on_ready(self):
-        self._ready = True
+        self._ready.set()
         self._logger.info(
             "Server join URL: https://discordapp.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=0"
             % DISCORD_CLIENT_ID)
@@ -70,21 +75,6 @@ class DiscordClient(discord.Client):
             self._worker.send(ConnectorRecvMessage(filtered_content, learn=True, reply=False))
             self._worker.recv()
 
-        # try replying after keyword
-        # if not message.author.bot:
-        '''if message.content.startswith('khep ') or message.content.startswith('khep '):
-            ModMessage = message.content[5:]
-            self._logger.debug("Message: %s" % filtered_content)
-            self._worker.send(ConnectorRecvMessage(filtered_content))
-            reply = self._worker.recv()
-            self._logger.debug("Reply: %s" % reply)
-            if reply is not None:
-                embed = discord.Embed(description=reply, color=message.author.color)
-                embed.set_footer(text = "Question asked by "+ message.author.name, icon_url = message.author.avatar_url)
-                await message.channel.send(reply)
-            return'''
-
-
         # Reply to mentions
         for mention in message.mentions:
             if str(mention) == DISCORD_USERNAME:
@@ -95,21 +85,33 @@ class DiscordClient(discord.Client):
                 if reply is not None:
                     embed = discord.Embed(description=reply, color=message.author.color)
                     embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                    embed.timestamp = datetime.utcnow()
                     await message.channel.send(embed=embed)
                 return
 
-        # Reply to private messages
+        # You don't really need embeds for private messages
+        # for the bot to reply in private messages
         if message.guild is None:
             self._logger.debug("Private Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
             reply = self._worker.recv()
             self._logger.debug("Reply: %s" % reply)
             if reply is not None:
-                embed = discord.Embed(description=reply, color=message.author.color)
-                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
-                await message.channel.send(embed=embed)
+                await message.channel.send(reply)
             return
 
+        # extra chunck where the bot will reply via keyword 
+        elif message.content.lower().startswith(('Khep','khep','Khepri','khepri')):
+            self._logger.debug("Message: %s" % filtered_content)
+            self._worker.send(ConnectorRecvMessage(filtered_content))
+            reply = self._worker.recv()
+            self._logger.debug("Reply: %s" % reply)
+            if reply is not None:
+                embed = discord.Embed(description=reply, color=message.author.color)
+                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                embed.timestamp = datetime.utcnow()
+                await message.channel.send(embed=embed)
+            return
 
 class DiscordWorker(ConnectorWorker):
     def __init__(self, read_queue: Queue, write_queue: Queue, shutdown_event: Event,
