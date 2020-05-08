@@ -37,7 +37,7 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
 class DiscordClient(discord.Client):
 
     def __init__(self, worker: 'DiscordWorker'):
-        discord.Client.__init__(self, activity=discord.Game(name="I imagine a future where I can be with you", type=3), status=discord.Status.idle)
+        discord.Client.__init__(self, activity=discord.Game(name="Your reality", type=3), status=discord.Status.idle)
         self._worker = worker
         self._ready.set()
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -102,6 +102,18 @@ class DiscordClient(discord.Client):
 
         # extra chunck where the bot will reply via keyword 
         elif message.content.lower().startswith(('Khep','khep','Khepri','khepri')):
+            self._logger.debug("Message: %s" % filtered_content)
+            self._worker.send(ConnectorRecvMessage(filtered_content))
+            reply = self._worker.recv()
+            self._logger.debug("Reply: %s" % reply)
+            if reply is not None:
+                embed = discord.Embed(description=reply, color=message.author.color)
+                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                embed.timestamp = datetime.utcnow()
+                await message.channel.send(embed=embed)
+            return
+
+        elif str(message.channel) in DISCORD_AUTO_TALK and message.content is not None: # a channel with the bot talking without the prefix, just like in direct messages
             self._logger.debug("Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
             reply = self._worker.recv()

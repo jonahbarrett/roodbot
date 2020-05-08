@@ -3,6 +3,7 @@ ignore files
 __pycache__
 config/*
 !connectors/discord.py
+!config/discord.example.py
 connectors/*
 db/*
 scripts/*
@@ -10,3 +11,6 @@ weights/*
 CAN YOU HEAR ME.txt
 detroitbecomehuman.txt
 import_txt.py
+
+all.txt
+generate_text.py

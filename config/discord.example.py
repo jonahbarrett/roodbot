@@ -13,6 +13,7 @@ DISCORD_CREDENTIALS = DiscordApiCredentials(token=DISCORD_TOKEN)
 
 DISCORD_USERNAME = 'SomeBot#1234'
 
+DISCORD_AUTO_TALK = ['khepri-free-talk']
 # Learn from all servers and channels
 DISCORD_LEARN_FROM_ALL = False
 
@@ -30,6 +31,7 @@ DISCORD_LEARN_FROM_USER = None
 # -------------------------------
 
 DISCORD_REMOVE_URL = True
+EMOTES_SKIP = True
 
 # Store training data here
 DISCORD_TRAINING_DB_PATH = 'db/discord.db'
