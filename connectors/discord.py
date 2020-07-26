@@ -26,7 +26,7 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
             reply = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', reply)
             reply = reply.strip()
         if EMOTES_SKIP:
-            reply = re.sub(r'<:[^\s]+:[0-9]*>', '', reply)
+            reply = re.sub(r'<(a?):([A-Za-z0-9_]+):([0-9]+)>', '', reply)
             reply = reply.strip()
         if len(reply) > 0:
             return reply
@@ -45,7 +45,7 @@ class DiscordClient(discord.Client):
     async def on_ready(self):
         self._ready.set()
         self._logger.info(
-            "Server join URL: https://discordapp.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=0"
+            "Server join URL: https://discord.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=0"
             % DISCORD_CLIENT_ID)
 
     async def on_message(self, message: discord.Message):
@@ -86,6 +86,7 @@ class DiscordClient(discord.Client):
                     embed = discord.Embed(description=reply, color=message.author.color)
                     embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
                     embed.timestamp = datetime.utcnow()
+                    await asyncio.sleep(0.5)
                     await message.channel.send(embed=embed)
                 return
 
@@ -97,6 +98,7 @@ class DiscordClient(discord.Client):
             reply = self._worker.recv()
             self._logger.debug("Reply: %s" % reply)
             if reply is not None:
+                await asyncio.sleep(0.5)
                 await message.channel.send(reply)
             return
 
@@ -110,6 +112,7 @@ class DiscordClient(discord.Client):
                 embed = discord.Embed(description=reply, color=message.author.color)
                 embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
+                await asyncio.sleep(0.5)
                 await message.channel.send(embed=embed)
             return
 
@@ -122,6 +125,7 @@ class DiscordClient(discord.Client):
                 embed = discord.Embed(description=reply, color=message.author.color)
                 embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
+                await asyncio.sleep(0.5)
                 await message.channel.send(embed=embed)
             return
 
