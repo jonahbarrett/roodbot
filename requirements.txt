@@ -1,8 +1,6 @@
-Keras
-spacy
+keras
+-U spacy
 spacymoji
-spacy
-numpy
 tweepy
 discord.py
-SQLAlchemy
+sqlalchemy
