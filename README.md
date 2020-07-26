@@ -19,16 +19,16 @@ armchair-expert is a chatbot inspired by old Markov chain IRC bots like PyBorg. 
 
 ## Installation
 There is a Requirements.txt file in the root folder, simply run
+
 ```
-pip install -r requirements.txt
-or
-pip3 install -r requirements.txt
+pip install -r requirements.txt 
 ```
 you need to manually run this part
 ```
-'python -m spacy download en'
+python -m spacy download en
 ```
-- You might need to install tensorflow manually and 2.0 should work but may have errors, especially an avx2 systems.
+- You can install tensorflow from pip, however the new versions beyond 1.15 has code breaking errors between keras and tensorflow. Beware of which versions you install.
+- You might need to install [tensorflow from here](https://github.com/fo40225/tensorflow-windows-wheel). Provided by **fo40225**.
 
 ## Setup & Training
 Navigate to the CONFIG folder:
@@ -42,24 +42,28 @@ Navigate to the CONFIG folder:
       python import_txt.py "<your-data-file-name-here>"
       ```
     - It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
+  
   - Another option is to let the bot run for a while and learn from the user messages being sent in the servers.
 - Be sure to check the discord connector as you can set channels for it to ignore, especially bot commands and what not.
 - Every time the bot starts it will train on all new data it acquired since it started up last
 - The bots sentence structure model is only trained once on initial start-up. To train it with the most recent acquired data, start the bot with the --retrain-structure flag. If you are noticing the bot is not generating sentences which the structure of learned material, this will help.
+
 
 # Connectors
 ## Discord
 - Navigate to the CONFIG folder:
 - Create a copy of discord.example.py and rename it to discord.py
 - Open the discord.py file with your text editor and fill the required fields
-  - You will need to register a bot with Discord: https://discordapp.com/developers/applications/me#top
-  - Click New Application and set a name for it, click the Bot tab and click add bot
+  - You will need to register a bot with Discord: https://discord.com/developers/applications/me#top
+  - Click New Application and set a name for it, click the Bot tab and click add bot.
   - Now copy the **Client ID**, **Username#xxxx**, and **TOKEN** to the discord.py file.
+  - Change the configuration as you wish, for instance enabling learn from all, etc.
+
 - Go back to the Root Directory
 - python armchair.py
 - When the bot starts you should see a message print to the console containing a link which will allow you to join the bot to a server.
 
-## Twitter
+## Twitter (not updated, not sure if twitter changed their api or not. Proceed at your own expense.)
 - You will need to create an application on the twitter developer site on your bot's twitter account https://apps.twitter.com
 - After creating it, assign it permissions to do direct messages (this isn't default)
 - Create an access token for your account
