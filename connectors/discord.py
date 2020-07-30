@@ -26,6 +26,7 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
             reply = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', reply)
             reply = reply.strip()
         if EMOTES_SKIP:
+            # Strips discord emotes
             reply = re.sub(r'<(a?):([A-Za-z0-9_]+):([0-9]+)>', '', reply)
             reply = reply.strip()
         if len(reply) > 0:
@@ -37,7 +38,7 @@ class DiscordReplyGenerator(ConnectorReplyGenerator):
 class DiscordClient(discord.Client):
 
     def __init__(self, worker: 'DiscordWorker'):
-        discord.Client.__init__(self, activity=discord.Game(name="Your reality", type=3), status=discord.Status.idle)
+        discord.Client.__init__(self, activity=discord.Game(name="My reality", type=3), status=discord.Status.dnd)
         self._worker = worker
         self._ready.set()
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -69,8 +70,7 @@ class DiscordClient(discord.Client):
         elif str(message.author) == DISCORD_LEARN_FROM_USER:
             DiscordTrainingDataManager().store(message)
             learn = True
-
-        # real-time learning
+        # Real-time learning
         if learn:
             self._worker.send(ConnectorRecvMessage(filtered_content, learn=True, reply=False))
             self._worker.recv()
@@ -90,20 +90,8 @@ class DiscordClient(discord.Client):
                     await message.channel.send(embed=embed)
                 return
 
-        # You don't really need embeds for private messages
-        # for the bot to reply in private messages
-        if message.guild is None:
-            self._logger.debug("Private Message: %s" % filtered_content)
-            self._worker.send(ConnectorRecvMessage(filtered_content))
-            reply = self._worker.recv()
-            self._logger.debug("Reply: %s" % reply)
-            if reply is not None:
-                await asyncio.sleep(0.5)
-                await message.channel.send(reply)
-            return
-
-        # extra chunck where the bot will reply via keyword 
-        elif message.content.lower().startswith(('Khep','khep','Khepri','khepri')):
+        # Extra chunck where the bot will reply via keyword
+        if message.content.lower().startswith(tuple(CHATTER_PREFIX)):
             self._logger.debug("Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
             reply = self._worker.recv()
@@ -116,7 +104,8 @@ class DiscordClient(discord.Client):
                 await message.channel.send(embed=embed)
             return
 
-        elif str(message.channel) in DISCORD_AUTO_TALK and message.content is not None: # a channel with the bot talking without the prefix, just like in direct messages
+        # Channel with the bot talking without the prefix, just like in direct messages
+        elif str(message.channel) in DISCORD_AUTO_TALK and message.content is not None:
             self._logger.debug("Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
             reply = self._worker.recv()
@@ -128,6 +117,17 @@ class DiscordClient(discord.Client):
                 await asyncio.sleep(0.5)
                 await message.channel.send(embed=embed)
             return
+
+        # For the bot to reply in private messages, no embeds for private channels
+        elif message.guild is None:
+                self._logger.debug("Private Message: %s" % filtered_content)
+                self._worker.send(ConnectorRecvMessage(filtered_content))
+                reply = self._worker.recv()
+                self._logger.debug("Reply: %s" % reply)
+                if reply is not None:
+                    await asyncio.sleep(0.5)
+                    await message.channel.send(reply)
+                return
 
 class DiscordWorker(ConnectorWorker):
     def __init__(self, read_queue: Queue, write_queue: Queue, shutdown_event: Event,
