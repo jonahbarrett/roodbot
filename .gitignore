@@ -4,13 +4,14 @@ __pycache__
 config/*
 !connectors/discord.py
 !config/discord.example.py
+
 connectors/*
 db/*
 scripts/*
+storage/*
 weights/*
-CAN YOU HEAR ME.txt
-detroitbecomehuman.txt
-import_txt.py
+*.txt
 
-all.txt
+import_text_file.py
+import_txt.py
 generate_text.py

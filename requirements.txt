@@ -1,6 +1,6 @@
-keras
+keras==2.2.4
 -U spacy
 spacymoji
 tweepy
 discord.py
-sqlalchemy
+sqlalchemy==1.3.18

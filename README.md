@@ -19,16 +19,19 @@ armchair-expert is a chatbot inspired by old Markov chain IRC bots like PyBorg. 
 
 ## Installation
 There is a Requirements.txt file in the root folder, simply run
+```
+pip install -r requirements.txt
+```
+- If you have
 
-```
-pip install -r requirements.txt 
-```
-you need to manually run this part
+you need to manually run this part with elavated permissions
 ```
 python -m spacy download en
 ```
-- You can install tensorflow from pip, however the new versions beyond 1.15 has code breaking errors between keras and tensorflow. Beware of which versions you install.
+- For my case I ran **1.14** for Python 3.7
+- You need to manually install tensorflow from pip, however the new versions beyond 1.15 has code breaking errors between keras and tensorflow. Beware of which versions you install.
 - You might need to install [tensorflow from here](https://github.com/fo40225/tensorflow-windows-wheel). Provided by **fo40225**.
+
 
 ## Setup & Training
 Navigate to the CONFIG folder:
@@ -42,7 +45,7 @@ Navigate to the CONFIG folder:
       python import_txt.py "<your-data-file-name-here>"
       ```
     - It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
-  
+
   - Another option is to let the bot run for a while and learn from the user messages being sent in the servers.
 - Be sure to check the discord connector as you can set channels for it to ignore, especially bot commands and what not.
 - Every time the bot starts it will train on all new data it acquired since it started up last
@@ -60,7 +63,7 @@ Navigate to the CONFIG folder:
   - Change the configuration as you wish, for instance enabling learn from all, etc.
 
 - Go back to the Root Directory
-- python armchair.py
+- open console within the directory and run, `python armchair.py`
 - When the bot starts you should see a message print to the console containing a link which will allow you to join the bot to a server.
 
 ## Twitter (not updated, not sure if twitter changed their api or not. Proceed at your own expense.)
