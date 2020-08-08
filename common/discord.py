@@ -1,11 +1,16 @@
 import discord
-
+import re
+from config.discord import *
 
 class DiscordHelper(object):
     @staticmethod
     def filter_content(message: discord.Message):
         # Replace mentions with names
         filtered_content = message.content
+        if filtered_content is not None and STRIP_EMOTES is True:
+            filtered_content = re.sub(r'<(a?):([A-Za-z0-9_]+):([0-9]+)>', '', filtered_content)
+            filtered_content = filtered_content.strip()
+
         for mention in message.mentions:
             try:
                 if mention.nick is not None:
