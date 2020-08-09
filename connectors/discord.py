@@ -56,6 +56,9 @@ class DiscordClient(discord.Client):
 
         filtered_content = DiscordHelper.filter_content(message)
 
+        if not len(filtered_content) > 3:
+            return
+
         learn = False
         # Learn from private messages
         if message.guild is None and DISCORD_LEARN_FROM_DIRECT_MESSAGE:
@@ -64,6 +67,13 @@ class DiscordClient(discord.Client):
         # Learn from all server messages
         elif message.guild is not None and DISCORD_LEARN_FROM_ALL:
             if str(message.channel) not in DISCORD_LEARN_CHANNEL_EXCEPTIONS:
+                DiscordTrainingDataManager().store(message)
+                learn = True
+        # Learn will accept new input from specified channel and neglect specified user
+        elif str(message.channel) in DISCORD_LEARN_CHANNEL and message.content is not None:
+            if str(message.author) in DISCORD_NEGLECT_LEARN:
+                return
+            else:
                 DiscordTrainingDataManager().store(message)
                 learn = True
         # Learn from User
@@ -75,6 +85,8 @@ class DiscordClient(discord.Client):
             self._worker.send(ConnectorRecvMessage(filtered_content, learn=True, reply=False))
             self._worker.recv()
 
+        # This pulls from discord config
+        TALKING_VARIANT = random.choice(TALKING_TO)
         # Reply to mentions
         for mention in message.mentions:
             if str(mention) == DISCORD_USERNAME:
@@ -84,7 +96,7 @@ class DiscordClient(discord.Client):
                 self._logger.debug("Reply: %s" % reply)
                 if reply is not None:
                     embed = discord.Embed(description=reply, color=message.author.color)
-                    embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                    embed.set_footer(text = TALKING_VARIANT + message.author.name, icon_url = message.author.avatar_url)
                     embed.timestamp = datetime.utcnow()
                     await asyncio.sleep(0.5)
                     await message.channel.send(embed=embed)
@@ -98,7 +110,7 @@ class DiscordClient(discord.Client):
             self._logger.debug("Reply: %s" % reply)
             if reply is not None:
                 embed = discord.Embed(description=reply, color=message.author.color)
-                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                embed.set_footer(text = TALKING_VARIANT + message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
                 await asyncio.sleep(0.5)
                 await message.channel.send(embed=embed)
@@ -112,7 +124,7 @@ class DiscordClient(discord.Client):
             self._logger.debug("Reply: %s" % reply)
             if reply is not None:
                 embed = discord.Embed(description=reply, color=message.author.color)
-                embed.set_footer(text = "In response to "+ message.author.name, icon_url = message.author.avatar_url)
+                embed.set_footer(text = str(TALKING_VARIANT) + message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
                 await asyncio.sleep(0.5)
                 await message.channel.send(embed=embed)
