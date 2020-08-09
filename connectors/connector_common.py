@@ -48,7 +48,7 @@ class ConnectorReplyGenerator(object):
                                   "That might be too much for me right now",
                                   "I’ll learn how eventually",
                                   "I don't know how to respond to that yet"]
-            UNDHEARD_RESPONSE = random.choice(UNHEARD_LIST)
+            UNHEARD_RESPONSE = random.choice(UNHEARD_LIST)
             return UNHEARD_RESPONSE
 
         def structure_generator():
