@@ -38,13 +38,23 @@ DISCORD_LEARN_FROM_USER = None
 # Don't learn from any of these channels
 DISCORD_LEARN_CHANNEL_EXCEPTIONS = []
 
+# Don't learn anything from selected user/s
+DISCORD_NEGLECT_LEARN = []
+
+# Embed footer messages, you can ignore here but you can add variations on the embed messages when talking to the bot
+TALKING_TO = ['Responding to ',
+              'Talking to ',
+              'Really bored and learning from ',
+              'Will dominate the world with ',
+              'Plotting schemes with ']
 # --- Technical Stuff Section ---
 # -------------------------------
 
+# Housekeeping
 DISCORD_REMOVE_URL = True
 EMOTES_SKIP = True
-# If you want learned messages to be printed in the console
-RECEIPT_LOGS = False
 
+# Stips discord emotes from messages
+STRIP_EMOTES = True
 # Store training data here
 DISCORD_TRAINING_DB_PATH = 'db/discord.db'
