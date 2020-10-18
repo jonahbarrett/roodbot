@@ -48,6 +48,15 @@ class DiscordClient(discord.Client):
         self._logger.info(
             "Server join URL: https://discord.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=0"
             % DISCORD_CLIENT_ID)
+        print('--------')
+        print('--------')
+        print("Discord.py verison: " + discord.__version__)
+        print('--------')
+        print("Ready in " + datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+        print('--------')
+        print('Connected to ' + str(self.user.name))
+        print('--------')
+        print('--------')
 
     async def on_message(self, message: discord.Message):
         # Prevent feedback loop
@@ -56,7 +65,10 @@ class DiscordClient(discord.Client):
 
         filtered_content = DiscordHelper.filter_content(message)
 
-        if not len(filtered_content) > 3:
+        # Ignore empty and letter messages
+        if not len(filtered_content) > 2:
+            return
+        if filtered_content == '':
             return
 
         learn = False
@@ -76,7 +88,7 @@ class DiscordClient(discord.Client):
             else:
                 DiscordTrainingDataManager().store(message)
                 learn = True
-        # Learn from User
+        # Learn from Specific User
         elif str(message.author) == DISCORD_LEARN_FROM_USER:
             DiscordTrainingDataManager().store(message)
             learn = True
@@ -85,9 +97,11 @@ class DiscordClient(discord.Client):
             self._worker.send(ConnectorRecvMessage(filtered_content, learn=True, reply=False))
             self._worker.recv()
 
-        # This pulls from discord config
+
+        # This pulls from discord config, just the embed footer for gags
         TALKING_VARIANT = random.choice(TALKING_TO)
         # Reply to mentions
+        # Typically has embeds so be sure to enable the embed permission across all channels
         for mention in message.mentions:
             if str(mention) == DISCORD_USERNAME:
                 self._logger.debug("Message: %s" % filtered_content)
@@ -102,7 +116,8 @@ class DiscordClient(discord.Client):
                     await message.channel.send(embed=embed)
                 return
 
-        # Extra chunck where the bot will reply via keyword
+        # Extra chunck where the bot will reply via keyword or prefix found in CHATTER_PREFIX
+        # Keep in mind this can happen anywhere the bot has access to send messages
         if message.content.lower().startswith(tuple(CHATTER_PREFIX)):
             self._logger.debug("Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
@@ -116,7 +131,7 @@ class DiscordClient(discord.Client):
                 await message.channel.send(embed=embed)
             return
 
-        # Channel with the bot talking without the prefix, just like in direct messages
+        # Channel which the bot will respond without any prefixes or @mentions
         elif str(message.channel) in DISCORD_AUTO_TALK and message.content is not None:
             self._logger.debug("Message: %s" % filtered_content)
             self._worker.send(ConnectorRecvMessage(filtered_content))
@@ -126,7 +141,7 @@ class DiscordClient(discord.Client):
                 embed = discord.Embed(description=reply, color=message.author.color)
                 embed.set_footer(text = str(TALKING_VARIANT) + message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.75)
                 await message.channel.send(embed=embed)
             return
 
@@ -165,7 +180,7 @@ class DiscordWorker(ConnectorWorker):
         self._db = DiscordTrainingDataManager()
         self._client = DiscordClient(self)
         self._client.loop.create_task(self._watchdog())
-        self._client.run(self._credentials.token)
+        self._client.run(self._credentials.token,bot=False)
 
 
 class DiscordScheduler(ConnectorScheduler):
