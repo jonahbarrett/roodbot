@@ -39,6 +39,7 @@ DISCORD_LEARN_FROM_USER = None
 DISCORD_LEARN_CHANNEL_EXCEPTIONS = []
 
 # Don't learn anything from selected user/s
+# This is a username string like, 'SomeDiscordDude#1234'
 DISCORD_NEGLECT_LEARN = []
 
 # Embed footer messages, you can ignore here but you can add variations on the embed messages when talking to the bot
@@ -56,5 +57,6 @@ EMOTES_SKIP = True
 
 # Stips discord emotes from messages
 STRIP_EMOTES = True
+
 # Store training data here
 DISCORD_TRAINING_DB_PATH = 'db/discord.db'

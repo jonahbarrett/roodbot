@@ -1,5 +1,11 @@
 # About
-armchair-expert is a chatbot inspired by old Markov chain IRC bots like PyBorg. It regurgitates what it learns from you in unintentionally hilarious ways.
+Armchair-expert is a chatbot inspired by old Markov chain IRC bots like PyBorg. It regurgitates what it learns from you in unintentionally hilarious ways.
+## This is a fork of [csvance/armchair-expert](https://github.com/csvance/armchair-expert)
+- has been updated to work with discord changes
+- added minor changes to the discord interactions
+- is a private bot, which you will need to run your own instance
+- you will need to add your own data-set
+
 
 ## Features
 - Uses NLP to select the most optimal subjects for which to generate a response
@@ -31,19 +37,18 @@ python -m spacy download en
 - For my case I ran **1.14** for Python 3.7
 - You need to manually install tensorflow from pip, however the new versions beyond 1.15 has code breaking errors between keras and tensorflow. Beware of which versions you install.
 - You might need to install [tensorflow from here](https://github.com/fo40225/tensorflow-windows-wheel). Provided by **fo40225**.
+- This was ran under a windows enviroment, so `python` could be `python3` in linux.
 
 
-## Setup & Training
+#### Setup & Training
 Navigate to the CONFIG folder:
 - Create a copy of armchair_expert.example.py and rename it to armchair_expert.py
 - Create a copy of config/ml.example.py and rename it to config/ml.py
 - Make sure you have the spacy 'en' dataset downloaded: 'python -m spacy download en'
 - It is preferred to import data first for training before starting the bot.
-  - You can use the provided script in "\scripts\import_text_file.py"
+  - You can use the provided import script in "\scripts\import_text_file.py"
     - Simply copy the script to the root folder, together with your txt file and run it as:
-      ```
-      python import_txt.py "<your-data-file-name-here>"
-      ```
+    `python import_txt.py "<your-data-file-name-here>"`
     - It would look like this: *python import_text_file.py "CAN YOU HEAR ME.txt"*
 
   - Another option is to let the bot run for a while and learn from the user messages being sent in the servers.
@@ -52,8 +57,8 @@ Navigate to the CONFIG folder:
 - The bots sentence structure model is only trained once on initial start-up. To train it with the most recent acquired data, start the bot with the --retrain-structure flag. If you are noticing the bot is not generating sentences which the structure of learned material, this will help.
 
 
-# Connectors
-## Discord
+### Connectors
+#### Discord
 - Navigate to the CONFIG folder:
 - Create a copy of discord.example.py and rename it to discord.py
 - Open the discord.py file with your text editor and fill the required fields
@@ -66,7 +71,7 @@ Navigate to the CONFIG folder:
 - open console within the directory and run, `python armchair.py`
 - When the bot starts you should see a message print to the console containing a link which will allow you to join the bot to a server.
 
-## Twitter (not updated, not sure if twitter changed their api or not. Proceed at your own expense.)
+#### Twitter (not updated, not sure if twitter changed their api or not. Proceed at your own expense.)
 - You will need to create an application on the twitter developer site on your bot's twitter account https://apps.twitter.com
 - After creating it, assign it permissions to do direct messages (this isn't default)
 - Create an access token for your account
