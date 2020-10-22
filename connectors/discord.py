@@ -180,7 +180,7 @@ class DiscordWorker(ConnectorWorker):
         self._db = DiscordTrainingDataManager()
         self._client = DiscordClient(self)
         self._client.loop.create_task(self._watchdog())
-        self._client.run(self._credentials.token,bot=False)
+        self._client.run(self._credentials.token)
 
 
 class DiscordScheduler(ConnectorScheduler):
