@@ -9,7 +9,7 @@ def create_nlp_instance():
     import spacy
     from spacymoji import Emoji
 
-    nlp = spacy.load('en')
+    nlp = spacy.load("en_core_web_sm")
     emoji_pipe = Emoji(nlp)
     nlp.add_pipe(emoji_pipe, first=True)
 
