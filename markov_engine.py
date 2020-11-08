@@ -7,6 +7,10 @@ from enum import unique, Enum
 from typing import Optional, List
 
 import numpy as np
+np.seterr(divide='ignore', invalid='ignore') # Ignore error below
+#RuntimeWarning: invalid value encountered in true_divide
+# p_values = distance_magnitudes / sums
+
 from spacy.tokens import Doc, Span, Token
 
 from config.ml import MARKOV_WINDOW_SIZE, MARKOV_GENERATION_WEIGHT_COUNT, MARKOV_GENERATION_WEIGHT_RATING, \

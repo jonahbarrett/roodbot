@@ -2,6 +2,9 @@ import pickle
 from typing import Tuple
 from spacy.tokens import Doc
 import numpy as np
+np.seterr(divide='ignore', invalid='ignore') # Ignore error below
+# RuntimeWarning: divide by zero encountered in log
+#  preds = np.log(preds) / temperature
 import os
 
 
