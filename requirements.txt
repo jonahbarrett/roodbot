@@ -1,5 +1,6 @@
+numpy==1.16.3
 keras==2.2.4
--U spacy
+spacy
 spacymoji
 tweepy
 discord.py
