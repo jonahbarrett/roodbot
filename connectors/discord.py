@@ -12,6 +12,7 @@ from spacy.tokens import Doc
 
 from datetime import datetime
 t1 = datetime.now()
+import tensorflow as tf
 
 class DiscordReplyGenerator(ConnectorReplyGenerator):
     def generate(self, message: str, doc: Doc = None) -> Optional[str]:
@@ -46,7 +47,7 @@ class DiscordClient(discord.Client):
     async def on_ready(self):
         self._ready.set()
         self._logger.info(
-            "Server join URL: https://discord.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=0"
+            "Server join URL: https://discord.com/oauth2/authorize?&client_id=%d&scope=bot&permissions=379968"
             % DISCORD_CLIENT_ID)
         print('--------')
         print('--------')
@@ -55,12 +56,13 @@ class DiscordClient(discord.Client):
         print("Ready in " + datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
         print('--------')
         print('Connected to ' + str(self.user.name))
+        print('using Tensorflow '+tf.__version__)
         print('--------')
         print('--------')
 
     async def on_message(self, message: discord.Message):
-        # Prevent feedback loop
-        if message.author.bot:
+        # Ignore attachements and Feedback Loop
+        if message.attachments or message.author.bot:
             return
 
         filtered_content = DiscordHelper.filter_content(message)
@@ -112,7 +114,7 @@ class DiscordClient(discord.Client):
                     embed = discord.Embed(description=reply, color=message.author.color)
                     embed.set_footer(text = TALKING_VARIANT + message.author.name, icon_url = message.author.avatar_url)
                     embed.timestamp = datetime.utcnow()
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(0.25)
                     await message.channel.send(embed=embed)
                 return
 
@@ -127,7 +129,7 @@ class DiscordClient(discord.Client):
                 embed = discord.Embed(description=reply, color=message.author.color)
                 embed.set_footer(text = TALKING_VARIANT + message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.25)
                 await message.channel.send(embed=embed)
             return
 
@@ -141,7 +143,7 @@ class DiscordClient(discord.Client):
                 embed = discord.Embed(description=reply, color=message.author.color)
                 embed.set_footer(text = str(TALKING_VARIANT) + message.author.name, icon_url = message.author.avatar_url)
                 embed.timestamp = datetime.utcnow()
-                await asyncio.sleep(0.75)
+                await asyncio.sleep(0.25)
                 await message.channel.send(embed=embed)
             return
 
@@ -152,7 +154,7 @@ class DiscordClient(discord.Client):
                 reply = self._worker.recv()
                 self._logger.debug("Reply: %s" % reply)
                 if reply is not None:
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(0.25)
                     await message.channel.send(reply)
                 return
 
