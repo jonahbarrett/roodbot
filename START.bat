@@ -1,0 +1,2 @@
+python armchair.py
+pause
